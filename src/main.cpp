@@ -21,8 +21,8 @@
 // https://randomnerdtutorials.com/esp32-static-fixed-ip-address-arduino-ide/
 // https://github.com/Freenove/Freenove_4WD_Car_Kit_for_ESP32/tree/master
 
-char *ssid_wifi = "Arcplexwifi";            // Le nom du réseau WiFi
-char *password_wifi = "Arcplexw1f1acce55!"; // Le password du WiFi
+char *ssid_wifi = "Reseau pas masquer";  // Le nom du réseau WiFi
+char *password_wifi = "4xrkhkdsuuu3s4i"; // Le password du WiFi
 
 const char *mqtt_server = "192.168.123.85"; // L'IP de votre broker MQTT
 const int mqtt_interval_ms = 5000;          // L'interval en ms entre deux envois de données
@@ -36,7 +36,7 @@ IPAddress primaryDNS(8, 8, 8, 8);
 IPAddress secondaryDNS(8, 8, 4, 4);
 
 AsyncWebServer server(80);
-AsyncWebSocket ws("/ws"); // Changez le nom de ce point d'accès pour "sécuriser" l'accès à votre voiture
+AsyncWebSocket ws("/carwebsocket"); // Changez le nom de ce point d'accès pour "sécuriser" l'accès à votre voiture
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -108,7 +108,7 @@ void setup()
     initWebSocket();
 
     // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-    //           { 
+    //           {
     //             camera_fb_t *fb = NULL;
     //             fb = esp_camera_fb_get();
     //                     if (fb != NULL)
