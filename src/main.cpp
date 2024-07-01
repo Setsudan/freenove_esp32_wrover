@@ -21,7 +21,7 @@
 // https://randomnerdtutorials.com/esp32-static-fixed-ip-address-arduino-ide/
 // https://github.com/Freenove/Freenove_4WD_Car_Kit_for_ESP32/tree/master
 
-char *ssid_wifi = "Reseau pas masquer";  // Le nom du réseau WiFi
+char *ssid_wifi = "ReseauPasMasquer";    // Le nom du réseau WiFi
 char *password_wifi = "4xrkhkdsuuu3s4i"; // Le password du WiFi
 
 const char *mqtt_server = "192.168.64.40"; // L'IP de votre broker MQTT
@@ -260,7 +260,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         else if (7 == cmd)
         {
             bool alarm = doc["data"] == 1;
-            Buzzer_Alarm(alarm);
+            Buzzer_Alarm(alarm, 1000);
         }
         else if (8 == cmd)
         {
@@ -327,45 +327,6 @@ void reconnect()
         }
     }
 }
-
-// void loopTask_Camera(void *pvParameters)
-// {
-//     while (1)
-//     {
-//         WiFiClient wf_client = server_Camera.available(); // listen for incoming clients
-//         if (wf_client)
-//         { // if you get a client
-//             Serial.println("Camera_Server connected to a client.");
-//             if (wf_client.connected())
-//             {
-//                 camera_fb_t *fb = NULL;
-//                 while (wf_client.connected())
-//                 { // loop while the client's connected
-//                     if (videoFlag == 1)
-//                     {
-//                         fb = esp_camera_fb_get();
-//                         if (fb != NULL)
-//                         {
-//                             uint8_t slen[4];
-//                             slen[0] = fb->len >> 0;
-//                             slen[1] = fb->len >> 8;
-//                             slen[2] = fb->len >> 16;
-//                             slen[3] = fb->len >> 24;
-//                             wf_client.write(slen, 4);
-//                             wf_client.write(fb->buf, fb->len);
-//                             Serial.println("Camera send");
-//                             esp_camera_fb_return(fb);
-//                         }
-//                     }
-//                 }
-//                 // close the connection:
-//                 wf_client.stop();
-//                 Serial.println("Camera Client Disconnected.");
-//                 ESP.restart();
-//             }
-//         }
-//     }
-// }
 
 void loopTask_Camera(void *pvParameters)
 {
