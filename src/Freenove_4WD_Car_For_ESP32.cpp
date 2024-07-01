@@ -198,12 +198,17 @@ void Buzzer_Variable(bool enable, int frequency)
 }
 
 // Buzzer alarm function
-void Buzzer_Alarm(bool enable)
+void Buzzer_Alarm(bool enable, int frequency = -1)
 {
   if (enable == 0)
     ledcWriteTone(BUZZER_CHN, 0);
   else
-    ledcWriteTone(BUZZER_CHN, BUZZER_FREQUENCY);
+  {
+    if (frequency != -1)
+      ledcWriteTone(BUZZER_CHN, frequency);
+    else
+      ledcWriteTone(BUZZER_CHN, BUZZER_FREQUENCY);
+  }
 }
 
 // Buzzer Alert function
@@ -380,21 +385,21 @@ void Car_Select(int mode)
 //
 
 /////////////////////Ultrasonic drive area//////////////////////////////
-#define PIN_SONIC_TRIG    12            //define Trig pin
-#define PIN_SONIC_ECHO    15            //define Echo pin
-#define MAX_DISTANCE      300           //cm
-#define SONIC_TIMEOUT (MAX_DISTANCE*60) // calculate timeout 
-#define SOUND_VELOCITY    340           //soundVelocity: 340m/s
+#define PIN_SONIC_TRIG 12                 // define Trig pin
+#define PIN_SONIC_ECHO 15                 // define Echo pin
+#define MAX_DISTANCE 300                  // cm
+#define SONIC_TIMEOUT (MAX_DISTANCE * 60) // calculate timeout
+#define SOUND_VELOCITY 340                // soundVelocity: 340m/s
 
-//Ultrasonic initialization
+// Ultrasonic initialization
 void Ultrasonic_Setup(void)
 {
-  pinMode(PIN_SONIC_TRIG, OUTPUT);// set trigPin to output mode
-  pinMode(PIN_SONIC_ECHO, INPUT); // set echoPin to input mode
+  pinMode(PIN_SONIC_TRIG, OUTPUT); // set trigPin to output mode
+  pinMode(PIN_SONIC_ECHO, INPUT);  // set echoPin to input mode
 }
 
-//Obtain ultrasonic distance data
-float Get_Sonar(void) 
+// Obtain ultrasonic distance data
+float Get_Sonar(void)
 {
   unsigned long pingTime;
   float distance;

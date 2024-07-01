@@ -21,19 +21,17 @@
 // https://randomnerdtutorials.com/esp32-static-fixed-ip-address-arduino-ide/
 // https://github.com/Freenove/Freenove_4WD_Car_Kit_for_ESP32/tree/master
 
-char *ssid_wifi = "Reseau pas masquer";  // Le nom du réseau WiFi
+char *ssid_wifi = "ReseauPasMasquer";    // Le nom du réseau WiFi
 char *password_wifi = "4xrkhkdsuuu3s4i"; // Le password du WiFi
 
-const char *mqtt_server = "192.168.123.85"; // L'IP de votre broker MQTT
-const int mqtt_interval_ms = 5000;          // L'interval en ms entre deux envois de données
+const char *mqtt_server = "192.168.31.87"; // L'IP de votre broker MQTT
+const int mqtt_interval_ms = 5000;         // L'interval en ms entre deux envois de données
 
-IPAddress localIP(192, 168, 123, 220); // l'IP que vous voulez donner à votre voiture
-
-IPAddress localGateway(192, 168, 123, 1); // L'IP de la gateway de votre réseau
-IPAddress localSubnet(255, 255, 255, 0);  // Le masque de sous réseau
-
-IPAddress primaryDNS(8, 8, 8, 8);
-IPAddress secondaryDNS(8, 8, 4, 4);
+IPAddress localIP(192, 168, 31, 50);     // The new IP address you want to assign to your car
+IPAddress localGateway(192, 168, 31, 1); // Update the gateway IP address if necessary
+IPAddress localSubnet(255, 255, 255, 0); // The subnet mask of your network
+IPAddress primaryDNS(8, 8, 8, 8);        // Primary DNS server
+IPAddress secondaryDNS(8, 8, 4, 4);      // Secondary DNS server
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/carwebsocket"); // Changez le nom de ce point d'accès pour "sécuriser" l'accès à votre voiture
@@ -72,7 +70,7 @@ void WiFi_Init()
 
 void setup()
 {
-    delay(5000);
+    // delay(5000);
 
     Serial.begin(115200);
     Serial.setDebugOutput(true);
@@ -147,37 +145,37 @@ void loop()
     WS2812_Show(ws2812_task_mode);   // Car color lights display function
 
     // The MQTT part
-    // if (!client.connected())
-    // {
-    //     reconnect();
-    // }
-    // client.loop();
+    if (!client.connected())
+    {
+        reconnect();
+    }
+    client.loop();
 
-    // long now = millis();
-    // if (now - last_message > mqtt_interval_ms)
-    // {
-    //     last_message = now;
+    long now = millis();
+    if (now - last_message > mqtt_interval_ms)
+    {
+        last_message = now;
 
-    //     // Les led et la batteries sont branchés tous les deux sur le pin 32
-    //     // du coup, lire la valeur de batterie fait freeze la batterie
-    //     // Battery level
-    //     // dtostrf(Get_Battery_Voltage(), 5, 2, buff);
-    //     // client.publish("esp32/battery", buff);
+        // Les led et la batteries sont branchés tous les deux sur le pin 32
+        // du coup, lire la valeur de batterie fait freeze la batterie
+        // Battery level
+        // dtostrf(Get_Battery_Voltage(), 5, 2, buff);
+        // client.publish("esp32/battery", buff);
 
-    //     // Track Read
-    //     Track_Read();
-    //     sensor_v = static_cast<int>(sensorValue[3]);
-    //     char const *n_char = std::to_string(sensor_v).c_str();
-    //     client.publish("esp32/track", n_char);
+        // Track Read
+        Track_Read();
+        sensor_v = static_cast<int>(sensorValue[3]);
+        char const *n_char = std::to_string(sensor_v).c_str();
+        client.publish("esp32/track", n_char);
 
-    //     // Ultrasonic Data
-    //     dtostrf(Get_Sonar(), 5, 2, ultrasonic_buff);
-    //     client.publish("esp32/sonar", ultrasonic_buff);
+        // Ultrasonic Data
+        dtostrf(Get_Sonar(), 5, 2, ultrasonic_buff);
+        client.publish("esp32/sonar", ultrasonic_buff);
 
-    //     // Photosensitive Data
-    //     dtostrf(Get_Photosensitive(), 5, 2, ultrasonic_buff);
-    //     client.publish("esp32/light", ultrasonic_buff);
-    // }
+        // Photosensitive Data
+        dtostrf(Get_Photosensitive(), 5, 2, ultrasonic_buff);
+        client.publish("esp32/light", ultrasonic_buff);
+    }
 }
 
 // put function definitions here:
@@ -260,7 +258,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         else if (7 == cmd)
         {
             bool alarm = doc["data"] == 1;
-            Buzzer_Alarm(alarm);
+            Buzzer_Alarm(alarm, 1000);
         }
         else if (8 == cmd)
         {
@@ -327,45 +325,6 @@ void reconnect()
         }
     }
 }
-
-// void loopTask_Camera(void *pvParameters)
-// {
-//     while (1)
-//     {
-//         WiFiClient wf_client = server_Camera.available(); // listen for incoming clients
-//         if (wf_client)
-//         { // if you get a client
-//             Serial.println("Camera_Server connected to a client.");
-//             if (wf_client.connected())
-//             {
-//                 camera_fb_t *fb = NULL;
-//                 while (wf_client.connected())
-//                 { // loop while the client's connected
-//                     if (videoFlag == 1)
-//                     {
-//                         fb = esp_camera_fb_get();
-//                         if (fb != NULL)
-//                         {
-//                             uint8_t slen[4];
-//                             slen[0] = fb->len >> 0;
-//                             slen[1] = fb->len >> 8;
-//                             slen[2] = fb->len >> 16;
-//                             slen[3] = fb->len >> 24;
-//                             wf_client.write(slen, 4);
-//                             wf_client.write(fb->buf, fb->len);
-//                             Serial.println("Camera send");
-//                             esp_camera_fb_return(fb);
-//                         }
-//                     }
-//                 }
-//                 // close the connection:
-//                 wf_client.stop();
-//                 Serial.println("Camera Client Disconnected.");
-//                 ESP.restart();
-//             }
-//         }
-//     }
-// }
 
 void loopTask_Camera(void *pvParameters)
 {

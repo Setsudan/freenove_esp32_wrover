@@ -36,7 +36,7 @@ void Motor_Move(int m1_speed, int m2_speed, int m3_speed, int m4_speed); // A fu
 
 //////////////////////Buzzer drive area////////////////////////////////////
 void Buzzer_Setup(void);                          // Buzzer initialization
-void Buzzer_Alarm(bool enable);                   // Buzzer alarm function
+void Buzzer_Alarm(bool enable, int frequency);    // Buzzer alarm function
 void Buzzer_Alert(int beat, int rebeat);          // Buzzer Alert function
 void Buzzer_Variable(bool enable, int frequency); // Buzzer variable frequency(Parameter 1, enabling signal, parameter 2, frequency value)
 
@@ -62,8 +62,8 @@ void Car_SetMode(int mode); // set the car mode
 void Car_Select(int mode);  ////select it to run car:0-command car，1-light car ，2-track car
 
 /////////////////////Ultrasonic drive area/////////////////////////////////
-void Ultrasonic_Setup(void);//Ultrasonic initialization
-float Get_Sonar(void);//Obtain ultrasonic distance data
+void Ultrasonic_Setup(void); // Ultrasonic initialization
+float Get_Sonar(void);       // Obtain ultrasonic distance data
 
 #endif
 
