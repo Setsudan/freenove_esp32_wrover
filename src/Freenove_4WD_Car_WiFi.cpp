@@ -45,7 +45,7 @@ void WiFi_Setup(bool WiFi_Mode)
     Serial.print("\nThen you can enter: '");
     Serial.print(local_ip);
     Serial.println("' to connect the car in Freenove app.");
-    playRideOfTheValkyrie();
+    // playRideOfTheValkyrie();
   }
   else
   {
@@ -62,7 +62,7 @@ void WiFi_Setup(bool WiFi_Mode)
     Serial.print("\nThen you can enter: '");
     Serial.print(local_IP);
     Serial.println("' to connect the car in Freenove app.");
-    playRideOfTheValkyrie();
+    // playRideOfTheValkyrie();
   }
 }
 
