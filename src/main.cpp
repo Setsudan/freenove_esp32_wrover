@@ -16,11 +16,12 @@
 
 #define STREAM_CONTENT_BOUNDARY "123456789000000000000987654321"
 
-char *ssid_wifi = "EthLny-TestWifi";
-char *password_wifi = "TrulyAnAmazingPassword9562!";
+char *ssid_wifi = "ReseauPasMasquer";
+char *password_wifi = "4xrkhkdsuuu3s4i";
 
-const char *mqtt_server = "192.168.137.1";
-const int mqtt_interval_ms = 5000;
+const char *mqtt_server = "192.168.167.243";
+const int mqtt_port = 1883;
+const int mqtt_interval_ms = 2000;
 
 const char *mqtt_server = "192.168.64.40"; // L'IP de votre broker MQTT
 const int mqtt_interval_ms = 5000;         // L'interval en ms entre deux envois de données
@@ -95,7 +96,7 @@ void setup()
     xTaskCreateUniversal(loopTask_Camera, "loopTask_Camera", 8192, NULL, 0, NULL, 0);
     xTaskCreateUniversal(loopTask_WTD, "loopTask_WTD", 8192, NULL, 0, NULL, 0);
 
-    client.setServer(mqtt_server, 1883);
+    client.setServer(mqtt_server, mqtt_port);
 
     initWebSocket();
 
@@ -133,6 +134,9 @@ void loop()
 
         dtostrf(Get_Photosensitive(), 5, 2, ultrasonic_buff);
         client.publish("esp32/light", ultrasonic_buff);
+
+        dtostrf(Get_Battery_Voltage(), 5, 2, buff);
+        client.publish("esp32/battery", buff);
     }
 }
 
