@@ -5,19 +5,19 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
-#include <Melody.h>
 
 ///////////////////WiFi drive area////////////////////////////////////////
-char *ssid_Router = "********";     // Modify according to your router name
-char *password_Router = "********"; // Modify according to your router password
-char *ssid_AP = "Sunshine";         // ESP32 turns on an AP and calls it Sunshine
-char *password_AP = "Sunshine";     // Set your AP password for ESP32 to Sunshine
+char* ssid_Router     =   "********";    //Modify according to your router name
+char* password_Router =   "********";    //Modify according to your router password
+char* ssid_AP         =   "Sunshine";    //ESP32 turns on an AP and calls it Sunshine
+char* password_AP     =   "Sunshine";    //Set your AP password for ESP32 to Sunshine
 bool WiFi_MODE = 1;
+
 IPAddress local_IP(192, 168, 4, 1);
 IPAddress gateway(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
-// Initialize WiFi function
+//Initialize WiFi function
 void WiFi_Setup(bool WiFi_Mode)
 {
   if (WiFi_Mode == 0)
@@ -30,8 +30,7 @@ void WiFi_Setup(bool WiFi_Mode)
     WiFi.setAutoReconnect(true);
 
     Serial.print("\nWaiting for WiFi...");
-    while (WiFi.isConnected() != true)
-    {
+    while (WiFi.isConnected() != true) {
       Serial.print(".");
       delay(500);
     }
@@ -45,7 +44,9 @@ void WiFi_Setup(bool WiFi_Mode)
     Serial.print("\nThen you can enter: '");
     Serial.print(local_ip);
     Serial.println("' to connect the car in Freenove app.");
-    PlayBeep();
+    Buzzer_Alarm(1);
+    delay(100);
+    Buzzer_Alarm(0);
   }
   else
   {
@@ -62,13 +63,14 @@ void WiFi_Setup(bool WiFi_Mode)
     Serial.print("\nThen you can enter: '");
     Serial.print(local_IP);
     Serial.println("' to connect the car in Freenove app.");
-    PlayBeep();
+    Buzzer_Alarm(1);
+    delay(100);
+    Buzzer_Alarm(0);
   }
 }
 
 int wtdFlag = 0;
-void loopTask_WTD(void *pvParameters)
-{
+void loopTask_WTD(void *pvParameters) {
   while (1)
   {
     if (WiFi_MODE == 0)
@@ -109,13 +111,13 @@ void loopTask_WTD(void *pvParameters)
 }
 
 ///////////////////Camera drive area///////////////////////////////////
-framesize_t frame_size = FRAMESIZE_CIF; // The default is to use the image size of FRAMESIZE CIF
-// Camera initialization
+framesize_t frame_size   =   FRAMESIZE_CIF;      //The default is to use the image size of FRAMESIZE CIF
+//Camera initialization
 bool cameraSetup(void)
 {
   camera_config_t config;
-  config.ledc_channel = LEDC_CHANNEL_1; // From modification
-  config.ledc_timer = LEDC_TIMER_1;     // From modification
+  config.ledc_channel = LEDC_CHANNEL_1;//From modification
+  config.ledc_timer = LEDC_TIMER_1;//From modification
   config.pin_d0 = Y2_GPIO_NUM;
   config.pin_d1 = Y3_GPIO_NUM;
   config.pin_d2 = Y4_GPIO_NUM;
@@ -139,25 +141,38 @@ bool cameraSetup(void)
   config.fb_count = 1;
   // camera init
   esp_err_t err = esp_camera_init(&config);
-  if (err != ESP_OK)
-  {
+  if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);
     return 0;
   }
   Serial.println("Camera configuration complete!");
   return 1;
 }
-// Set the camera to flip up and down
+//Set the camera to flip up and down
 void camera_vflip(bool enable)
 {
-  sensor_t *s = esp_camera_sensor_get();
+  sensor_t * s = esp_camera_sensor_get();
   s->set_vflip(s, enable);
 }
-// Set the camera to flip left and right
+//Set the camera to flip left and right
 void camera_hmirror(bool enable)
 {
-  sensor_t *s = esp_camera_sensor_get();
+  sensor_t * s = esp_camera_sensor_get();
   s->set_hmirror(s, enable);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //
