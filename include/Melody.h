@@ -4,5 +4,6 @@
 
 void playRideOfTheValkyrie();
 void playRickRoll();
+void PlayBeep();
 
 #endif

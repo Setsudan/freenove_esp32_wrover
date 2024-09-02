@@ -19,12 +19,14 @@
 char *ssid_wifi = "ReseauPasMasquer";
 char *password_wifi = "4xrkhkdsuuu3s4i";
 
-const char *mqtt_server = "192.168.167.243";
-const int mqtt_port = 1883;
-const int mqtt_interval_ms = 2000;
+const char *mqtt_server = "c845a596d99342dd8366f65625a229b3.s1.eu.hivemq.cloud";
+const int mqtt_port = 8883;
+const int mqtt_interval_ms = 5000;
+const char *mqtt_username = "caresp32";
+const char *mqtt_password = "sQ^Y%esqYCU^cP%3Vd*8";
 
-IPAddress localIP(192, 168, 167, 50);
-IPAddress localGateway(192, 168, 167, 241);
+IPAddress localIP(192, 168, 4, 50);
+IPAddress localGateway(192, 168, 4, 240);
 IPAddress localSubnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);
 IPAddress secondaryDNS(8, 8, 4, 4);
