@@ -19,9 +19,11 @@
 char *ssid_wifi = "ReseauPasMasquer";
 char *password_wifi = "4xrkhkdsuuu3s4i";
 
-const char *mqtt_server = "192.168.167.243";
-const int mqtt_port = 1883;
-const int mqtt_interval_ms = 2000;
+const char *mqtt_server = "c845a596d99342dd8366f65625a229b3.s1.eu.hivemq.cloud";
+const int mqtt_port = 8883;
+const int mqtt_interval_ms = 5000;
+const char *mqtt_username = "caresp32";
+const char *mqtt_password = "sQ^Y%esqYCU^cP%3Vd*8";
 
 const char *mqtt_server = "192.168.64.40"; // L'IP de votre broker MQTT
 const int mqtt_interval_ms = 5000;         // L'interval en ms entre deux envois de données

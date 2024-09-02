@@ -224,3 +224,10 @@ void playRickRoll()
         delay(noteDuration * 0.3);
     }
 }
+
+void PlayBeep()
+{
+    Buzzer_Alarm(1, 1000);
+    delay(100);
+    Buzzer_Alarm(0, 0);
+}
