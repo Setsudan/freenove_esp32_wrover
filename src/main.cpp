@@ -16,18 +16,21 @@
 
 #define STREAM_CONTENT_BOUNDARY "123456789000000000000987654321"
 
-char *ssid_wifi = "Numericable-79fd";
-char *password_wifi = "yn2gy5r7qwhq";
+char *ssid_wifi = "ReseauPasMasquer";
+char *password_wifi = "4xrkhkdsuuu3s4i";
 
-const int mqtt_port = 1883;
+const char *mqtt_server = "c845a596d99342dd8366f65625a229b3.s1.eu.hivemq.cloud";
+const int mqtt_port = 8883;
 const int mqtt_interval_ms = 5000;
-const char *mqtt_username = "guest";
-const char *mqtt_password = "guest";
+const char *mqtt_username = "caresp32";
+const char *mqtt_password = "sQ^Y%esqYCU^cP%3Vd*8";
 
-const char *mqtt_server = "13.60.74.162"; // L'IP de votre broker MQTT
-IPAddress localIP(192, 168, 0, 50); // l'IP que vous voulez donner à votre voiture
+const char *mqtt_server = "192.168.64.40"; // L'IP de votre broker MQTT
+const int mqtt_interval_ms = 5000;         // L'interval en ms entre deux envois de données
 
-IPAddress localGateway(192, 168, 0, 1); // L'IP de la gateway de votre réseau
+IPAddress localIP(192, 168, 64, 50); // l'IP que vous voulez donner à votre voiture
+
+IPAddress localGateway(192, 168, 64, 136); // L'IP de la gateway de votre réseau
 IPAddress localSubnet(255, 255, 255, 0);   // Le masque de sous réseau
 
 IPAddress primaryDNS(8, 8, 8, 8);
@@ -48,27 +51,6 @@ int distance[4];
 int sensor_v;
 char buff[6];
 char ultrasonic_buff[10];
-char distance_buff[10];   // Buffer to store the distance
-char speed_buff[10];      // Buffer to store the speed
-char  race_id_buffer[10];  // buffer to store the rice_id
-// Variables for the timer
-unsigned long startTime = 0;
-bool timerActive = false;
-// variable du calcul de distance 
-int data_total_0 = 0;
-int data_total_1 = 0;
-int data_total_2 = 0;
-int data_total_3 = 0;
-float total_Distance = 0.0;
-// Variable vitesse 
-float total_speed = 0.0;
-// race variable
- int race_id = 0;
- bool race_change = false;
-
-
-
-
 
 void WiFi_Init();
 void loopTask_Camera(void *pvParameters);
@@ -125,119 +107,38 @@ void setup()
     Emotion_SetMode(1);
     WS2812_SetMode(1);
 }
-// Fonction pour calculer la distance
-void updateDistance(unsigned long duration)
-{
-    // Vérifier si toutes les valeurs des capteurs sont égales
-    if (data_total_0 == data_total_1 && data_total_1 == data_total_2 && data_total_2 == data_total_3)
-    {
-        // Calculer la distance totale avec les valeurs des capteurs égales
-        float circonference = 20.42; // Circonférence en cm (ajuster selon votre véhicule)
-        float tour_seconde = (data_total_0 * 2.5) / 100;
-        total_Distance = circonference * tour_seconde * (duration / 1000.0);
-    }
-    else
-    {
-        // Calculer la distance totale avec les valeurs moyennes des capteurs
-        float average = (data_total_0 + data_total_1 + data_total_2 + data_total_3) / 4.0;
-        float circonference = 20.42; // Circonférence en cm (ajuster selon votre véhicule)
-        float tour_seconde = (average * 2.5) / 100;
-        total_Distance = circonference * tour_seconde * (duration / 1000.0);
-    }
-}
+
 void loop()
 {
-    // put your main code here, to run repeatedly:
     ws.cleanupClients();
 
-    Emotion_Show(emotion_task_mode); // Led matrix display function
-    WS2812_Show(ws2812_task_mode);   // Car color lights display function
+    Emotion_Show(emotion_task_mode);
+    WS2812_Show(ws2812_task_mode);
 
-    // The MQTT part
     if (!client.connected())
     {
         reconnect();
     }
     client.loop();
 
-   long now = millis();
+    long now = millis();
     if (now - last_message > mqtt_interval_ms)
     {
         last_message = now;
 
-        if (race_change)
-        {
-            // Les led et la batteries sont branchés tous les deux sur le pin 32
-            // du coup, lire la valeur de batterie fait freeze la batterie
-            // Battery level
-            dtostrf(Get_Battery_Voltage(), 5, 2, buff);
-            client.publish("esp32bis/battery", buff);
+        Track_Read();
+        sensor_v = static_cast<int>(sensorValue[3]);
+        char const *n_char = std::to_string(sensor_v).c_str();
+        client.publish("esp32/track", n_char);
 
-            // Track Read
-            Track_Read();
-            sensor_v = static_cast<int>(sensorValue[3]);
-            char const *n_char = std::to_string(sensor_v).c_str();
-            client.publish("esp32bis/track", n_char);
+        dtostrf(Get_Sonar(), 5, 2, ultrasonic_buff);
+        client.publish("esp32/sonar", ultrasonic_buff);
 
-            // Ultrasonic Data
-            dtostrf(Get_Sonar(), 5, 2, ultrasonic_buff);
-            client.publish("esp32bis/sonar", ultrasonic_buff);
+        dtostrf(Get_Photosensitive(), 5, 2, ultrasonic_buff);
+        client.publish("esp32/light", ultrasonic_buff);
 
-            // Photosensitive Data
-            dtostrf(Get_Photosensitive(), 5, 2, ultrasonic_buff);
-            client.publish("esp32bis/light", ultrasonic_buff);
-
-            // Send the total distance
-            dtostrf(total_Distance, 5, 2, distance_buff);
-            client.publish("esp32bis/distance", distance_buff);
-
-            // Send timer data if active
-            if (timerActive)
-            {
-                // send Time
-                unsigned long duration = millis() - startTime;
-                float duration_in_seconds = duration / 1000.0; // Convert duration to seconds
-                char timer_buff[10];
-                dtostrf(duration_in_seconds, 5, 2, timer_buff);
-                client.publish("esp32bis/timer", timer_buff);
-
-                //send distance 
-                updateDistance(duration);
-
-                // send distance total
-                dtostrf(total_Distance, 5, 2, distance_buff);
-                client.publish("esp32bis/distance", distance_buff);
-
-                // send speed
-                total_speed = total_Distance / duration_in_seconds; // Calculate speed
-                dtostrf(total_speed, 5, 2, speed_buff);
-                client.publish("esp32bis/speed", speed_buff);
-            }
-
-            // Envoie l'ID de la course uniquement si race_change est true
-            dtostrf(race_id, 5, 2, race_id_buffer);
-            client.publish("esp32bis/race", race_id_buffer);
-        }
-        else
-        {
-              // Si race_change est false, envoie seulement "false" dans le topic "esp32bis/race"
-        client.publish("esp32bis/race", "false");
-
-        // Réinitialiser toutes les variables à leurs valeurs par défaut
-        total_Distance = 0.0;
-        total_speed = 0.0;
-        timerActive = false;
-        startTime = 0;
-        race_id = 0;
-        race_change = false;
-
-        // Réinitialisation des buffers pour ne pas garder les anciennes données
-        memset(buff, 0, sizeof(buff));
-        memset(ultrasonic_buff, 0, sizeof(ultrasonic_buff));
-        memset(distance_buff, 0, sizeof(distance_buff));
-        memset(speed_buff, 0, sizeof(speed_buff));
-        memset(race_id_buffer, 0, sizeof(race_id_buffer));
-        }
+        dtostrf(Get_Battery_Voltage(), 5, 2, buff);
+        client.publish("esp32/battery", buff);
     }
 }
 
@@ -266,29 +167,16 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         }
 
         int cmd = doc["cmd"];
-        if (1 == cmd) {
-        JsonArray data = doc["data"];
-        int data_0 = data[0];
-        int data_1 = data[1];
-        int data_2 = data[2];
-        int data_3 = data[3];
 
-        Motor_Move(data_0, data_1, data_2, data_3);
+        if (1 == cmd)
+        {
+            JsonArray data = doc["data"];
+            int data_0 = data[0];
+            int data_1 = data[1];
+            int data_2 = data[2];
+            int data_3 = data[3];
 
-        if (data_0 == 0 && data_1 == 0 && data_2 == 0 && data_3 == 0) {
-            // Stop the timer
-            startTime = 0;
-            timerActive = false;
-        } else {    
-            // Start the timer
-            startTime = millis();
-            timerActive = true;
-            // initialize wheelSpeed variable
-            data_total_0 = data_0;
-            data_total_1 = data_1;
-            data_total_2 = data_2;
-            data_total_3 = data_3;
-        }
+            Motor_Move(data_0, data_1, data_2, data_3);
         }
         else if (2 == cmd)
         {
@@ -345,15 +233,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
             bool video_activation = doc["data"] == 1;
             videoFlag = video_activation;
         }
-        else if (10 == cmd) {
-        race_id = doc["data"];
-        if (race_id == 0)
-        {
-            race_change = false;
-        }else{
-            race_change = true;
-        }   
-        }
+
         notifyClients();
     }
 }
