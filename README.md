@@ -120,3 +120,9 @@ Je vais ensuite allumer les LED 1, 2, 3 et 4 en rouge
 	"data": [8, 255, 0, 0]
 }
 ```
+```json
+{
+	"cmd": 10,
+	"data": RACE_ID (integer)
+}
+```
