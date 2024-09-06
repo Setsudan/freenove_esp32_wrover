@@ -97,14 +97,14 @@ void Motor_Move(int m1_speed, int m2_speed, int m3_speed, int m4_speed)
   m4_speed = MOTOR_4_DIRECTION * constrain(m4_speed, MOTOR_SPEED_MIN, MOTOR_SPEED_MAX);
   if (m1_speed > 0)
   {
-    m1_speed = constrain(m1_speed, 1600, 4095);
+    //m1_speed = constrain(m1_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M1_IN1, m1_speed);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M1_IN2, 0);
   }
   else if (m1_speed < 0)
   {
     m1_speed = -m1_speed;
-    m1_speed = constrain(m1_speed, 1600, 4095);
+    //m1_speed = constrain(m1_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M1_IN1, 0);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M1_IN2, m1_speed);
   }
@@ -115,14 +115,14 @@ void Motor_Move(int m1_speed, int m2_speed, int m3_speed, int m4_speed)
   }
   if (m2_speed > 0)
   {
-    m2_speed = constrain(m2_speed, 1600, 4095);
+   // m2_speed = constrain(m2_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M2_IN1, m2_speed);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M2_IN2, 0);
   }
   else if (m2_speed < 0)
   {
     m2_speed = -m2_speed;
-    m2_speed = constrain(m2_speed, 1600, 4095);
+    //m2_speed = constrain(m2_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M2_IN1, 0);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M2_IN2, m2_speed);
   }
@@ -133,14 +133,14 @@ void Motor_Move(int m1_speed, int m2_speed, int m3_speed, int m4_speed)
   }
   if (m3_speed > 0)
   {
-    m3_speed = constrain(m3_speed, 1600, 4095);
+    //m3_speed = constrain(m3_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M3_IN1, m3_speed);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M3_IN2, 0);
   }
   else if (m3_speed < 0)
   {
     m3_speed = -m3_speed;
-    m3_speed = constrain(m3_speed, 1600, 4095);
+    //m3_speed = constrain(m3_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M3_IN1, 0);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M3_IN2, m3_speed);
   }
@@ -151,14 +151,14 @@ void Motor_Move(int m1_speed, int m2_speed, int m3_speed, int m4_speed)
   }
   if (m4_speed > 0)
   {
-    m4_speed = constrain(m4_speed, 1600, 4095);
+    //m4_speed = constrain(m4_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M4_IN1, m4_speed);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M4_IN2, 0);
   }
   else if (m4_speed < 0)
   {
     m4_speed = -m4_speed;
-    m4_speed = constrain(m4_speed, 1600, 4095);
+    //m4_speed = constrain(m4_speed, 1600, 4095);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M4_IN1, 0);
     pca9685.setChannelPulseWidth(PIN_MOTOR_M4_IN2, m4_speed);
   }
@@ -296,10 +296,10 @@ void Light_Car(int mode)
 #define PCF8574_ADDRESS 0x20 // Tracking module IIC address
 #define PCF8574_SDA 13       // Define the SDA pin number
 #define PCF8574_SCL 14       // Define the SCL pin number
-#define SPEED_LV4 (4000)
-#define SPEED_LV3 (3000)
-#define SPEED_LV2 (2500)
-#define SPEED_LV1 (1500)
+#define SPEED_LV4 (1500)
+#define SPEED_LV3 (1500)
+//#define SPEED_LV2 (2500)
+#define SPEED_LV1 (2500)
 
 unsigned char sensorValue[4] = {0};
 PCF8574 TRACK_SENSOR(PCF8574_ADDRESS);
@@ -320,7 +320,7 @@ void Track_Read(void)
 }
 
 // Track Car
-void Track_Car(int mode)
+void Track_Car(int mode)   // Mise a jour de la fonction Track
 {
   if (mode == 1)
   {
@@ -329,23 +329,23 @@ void Track_Car(int mode)
     {
     case 2: // 010
     case 5: // 101
+     case 0: // 000
+     case 1: // 001
+      case 4: // 100
       Emotion_SetMode(3);
       Motor_Move(SPEED_LV1, SPEED_LV1, SPEED_LV1, SPEED_LV1); // Move Forward
       break;
-    case 0: // 000
     case 7: // 111
       Emotion_SetMode(6);
       Motor_Move(0, 0, 0, 0); // Stop
       break;
-    case 1: // 001
     case 3: // 011
       Emotion_SetMode(4);
-      Motor_Move(-SPEED_LV3, -SPEED_LV3, SPEED_LV4, SPEED_LV4); // Turn Left
+      Motor_Move(SPEED_LV4, SPEED_LV4, -SPEED_LV3, -SPEED_LV3); // Turn Right
       break;
-    case 4: // 100
     case 6: // 110
       Emotion_SetMode(5);
-      Motor_Move(SPEED_LV4, SPEED_LV4, -SPEED_LV3, -SPEED_LV3); // Turn Right
+      Motor_Move(-SPEED_LV3, -SPEED_LV3, SPEED_LV4, SPEED_LV4); // Turn Left
       break;
 
     default:
@@ -353,7 +353,6 @@ void Track_Car(int mode)
     }
   }
 }
-
 //////////////////////Car drive area////////////////////////////////////////
 int carFlag = 0;
 // set car mode

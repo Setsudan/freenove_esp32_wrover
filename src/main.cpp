@@ -353,8 +353,20 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         }else{
             race_change = true;
         }   
+        } // Commande 11 pour track_move (suivi deligne )
+        else if (11 == cmd) {
+            int mode = doc["data"];
+            while (mode == 1) { 
+                Track_Car(1);
+                delay(10);
+                if (mode == 0) {
+                    break;
+                    Motor_Move(0,0,0,0);
+                }
+            }
         }
         notifyClients();
+        
     }
 }
 
